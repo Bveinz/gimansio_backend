@@ -1,104 +1,26 @@
-const express = require('express')
-const cors = require('cors')
-const mysql = require('mysql')
-const bodyParser = require('body-parser')
-const app = express()
-app.use(cors())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json({ limit: '10mb' }))
-// const JWT = require('jsonwebtoken')
-// const secretWord = 'Samus#Aran'
+const express = require("express");
+const cors = require("cors");
 
-const credentials = {
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'gym'
-}
+const routes = require("./src/Routes/Routes");
 
-app.get('/', (req, res) => {
-	res.send('hola desde tu primera ruta de la Api')
-})
+const PORT = process.env.PORT || 4000;
 
-app.post('/api/login', (req, res) => {
-	const { username, password } = req.body
-	const values = [username, password]
-	var connection = mysql.createConnection(credentials)
-	connection.query("SELECT * FROM clientes WHERE nombre = ? AND contraseña = ?", values, (err, result) => {
-		if (err) {
-			res.status(500).send(err)
-		} else {
-			if (result.length > 0) {
-				res.status(200).send({
-					"idClientes": result[0].idClientes,
-					"Nombre": result[0].Nombre,
-					"ApellidoPaterno": result[0].ApellidoPaterno,
-					"ApellidoMaterno": result[0].ApellidoMaterno,
-                    "Rut": result[0].Rut,
-				})
+const app = express();
 
-			} else {
-				res.status(400).send('Usuario no existe')
-			}
-		}
-	})
-	connection.end()
-})
+app.use(express.urlencoded({extended:true}));
+app.use(express.json())
 
-app.post('/api/registro', (req,res) =>{
-	const {nombre, apellido_paterno,apellido_materno,rut,fecha_nacimiento, password} = req.body
-	const values = [nombre,apellido_paterno,apellido_materno,rut,fecha_nacimiento,password]
-	var connection = mysql.createConnection(credentials)
-	connection.query("INSERT INTO clientes (Nombre,ApellidoPaterno,ApellidoMaterno,Rut,fechaNacimiento,contraseña) VALUES(?,?,?,?,?,?)", values, (err, result)=>{
-		if(err){
-			res.status(500).send(err)
-		}else{
-			res.json({message:"nuevo usuario agregado"})
-		}
-	})
-	connection.end()
-})
+app.use(cors());
 
-app.get('/api/clientes', (req,res) =>{
-	var connection = mysql.createConnection(credentials)
-	connection.query("SELECT * FROM clientes", (err, result)=>{
-		if(err){
-			res.status(500).send(err)
-		}else{
-			res.json(result)
-		}
-	})
-	connection.end()
-})
+app.use('/api/',routes());
 
-/// planes
-// Traer todos los planes
-app.get('/api/planes', (req,res) =>{
-	var connection = mysql.createConnection(credentials)
-	connection.query("SELECT * FROM planes", (err, result)=>{
-		if(err){
-			res.status(500).send(err)
-		}else{
-			res.json(result)
-		}
-	})
-	connection.end()
-})
 
-// admin agrega un plan
+app.listen(PORT, () => {
+    console.log("Corriendo en el puerto", PORT)
+});
 
-app.post('/api/planes/agregar', (req,res) =>{
-	const {nombre, precio, horas} = req.body
-	const values = [nombre, precio, horas]
-	var connection = mysql.createConnection(credentials)
-	connection.query("INSERT INTO planes (Nombre, Precio ,Horas ) VALUES(?,?,?)", values, (err, result)=>{
-		if(err){
-			res.status(500).send(err)
-		}else{
-			res.json({message:"Plan AGREGADO"})
-		}
-	})
-	connection.end()
-})
 
-app.listen(4000, () => console.log('hola soy el servidor'))
+
+
+
+
