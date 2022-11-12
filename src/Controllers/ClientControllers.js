@@ -21,7 +21,7 @@ exports.login = (req, res) => {
 			}
 		}
 	})
-}
+};
 exports.Registro = (req,res) =>{
 	const {nombre, apellido_paterno,apellido_materno,rut,fecha_nacimiento, password} = req.body
 	const values = [nombre,apellido_paterno,apellido_materno,rut,fecha_nacimiento,password]
@@ -32,7 +32,16 @@ exports.Registro = (req,res) =>{
 			res.json({message:"nuevo usuario agregado"})
 		}
 	})
-}
+};
 
 
+exports.VerClientes = (req,res) => {
+	pool.query("SELECT * FROM clientes", (err,result) =>{
+		if (err) {
+			res.status(500).send(err)
+		}else{
+			res.json(result)
+		};
+	});
+};
 
